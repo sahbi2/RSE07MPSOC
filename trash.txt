@@ -1,0 +1,22 @@
+//trash
+
+for (i=0; i< nbPoints; i++)
+    for (j=0; j< nbCoordinates; j++)
+    {
+        pos=i+
+      *(data_x[i][j])= data[i][j];
+    printf ("\n data_x= %f\n",  (float) data_x[i][j]);
+    printf("\n data= %u\n",data[i][j]);
+  //  printf ("\n data.h= %u\n",  (uint) data[i,j]);
+    }
+//  centroids
+int K = (int) sqrt(nbPoints); // number of clusters
+srand(time(NULL));
+float* centroids = malloc((K * nbCoordinates)*sizeof(float));
+for (i=0;i< K; i++)
+    for (j=0; j< nbCoordinates; j++)
+    {
+        int randomIndex= rand() % nbPoints;
+        centroids[i][j]=data_x[randomIndex][j];
+         printf ("\n randomIndex= %d , centoids= %f\n", randomIndex, (float) centroids[i][j]);
+    }
