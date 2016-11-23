@@ -1,3 +1,7 @@
+// *********************************************************************************************************
+// *                               Projet RSE07 : Algorithme K-means                                       *
+// *                                       Sahbi MALLOULI                                                  *
+// *********************************************************************************************************
 #include<stdio.h>
 #include<stdlib.h>
 #include "cluster.h"
@@ -7,8 +11,6 @@
 #include "data.h"
 #include<string.h>
 
-#define IterMAX 10
-#define inf INFINITY
 
 
 int main( int argc, char * argv[])
@@ -30,8 +32,6 @@ for( c=0;c<nbPoints; c++)
         pos=d+ c*nbCoordinates;
         data_x[pos]= (float)data[c][d];
     }
-
-
 srand(time(NULL));
 int r;
 int randIdx[nbCluster];
@@ -51,133 +51,108 @@ for( c=0;c<nbCluster; c++){
        int posCt ;
        posCt= d + c*nbCoordinates;
        centroids[posCt]= (float)data[randIdx[c]][d];
-       // printf("data_x =%f",data_x[pos]);
     }
 }
-
+ printf("\n===================================================\n");
 int sampleCluster_idx[nbPoints];
 int ctrNoMove, doKmeans=0;
 printf("\n===================begin K-means Algorithm =================================\n");
-//Compute
+//Compute K-means algorithm
 do{
-fflush(stdin); 
-doKmeans+=1;
-ctrNoMove=nbCluster*nbPoints;
 
-tempCentroids = malloc(nbCluster*nbCoordinates*sizeof(float));
+    doKmeans+=1;
+    ctrNoMove=0;
+
+    tempCentroids = malloc(nbCluster*nbCoordinates*sizeof(float));
 
 //save the old centroids
-for(c=0;c<nbCluster;c++){
-    for(d==0;d<nbCoordinates;d++){
-         tempCentroids[d+c*nbCoordinates]=centroids[d+c*nbCoordinates];
-     }
-}
-
+    for(c=0;c<nbCluster;c++){
+        for(d=0;d<nbCoordinates;d++){
+            tempCentroids[d+c*nbCoordinates]=centroids[d+c*nbCoordinates];
+        }
+    }
 //cluster assignment step
-int sampleIdx=0;
-    while(sampleIdx<nbPoints)
-    
-    {
-        
-        
-        float distXCluster[nbCluster];
-        for(c=0;c<nbCluster;c++)
-        {
-          float distance;
-          distance=0;
-          for(d=0; d<nbCoordinates; d++)
-          {
-            int pos_d;
-            pos_d= d+c*nbCoordinates;
-            distance += distEuclid(data_x[sampleIdx*nbCoordinates+d],tempCentroids[pos_d]);
-          }
-          distance = sqrt(distance);
-          distXCluster[c] = distance;
+    int sampleIdx;
+    for (sampleIdx=0; sampleIdx < nbPoints; sampleIdx++){ 
+        double distXCluster[nbCluster];
+        for(c=0;c<nbCluster;c++){
+        double distance;
+            distance=0;
+            for(d=0; d<nbCoordinates; d++){ 
+                distance += distEuclid(data_x[sampleIdx*nbCoordinates+d],tempCentroids[d+c*nbCoordinates]);
+            }
+            distXCluster[c] = sqrt(distance);
         }
         sampleCluster_idx[sampleIdx] = minItem(distXCluster, nbCluster);
-        sampleIdx++;   
-        
-        }
-
-//Move centroids
-int clusterIdx;
-for (clusterIdx=0; clusterIdx<nbCluster; clusterIdx++){
+    }
     
-    float acc[nbCoordinates];
-    int counter;
-    counter=0;
-    for (c=0; c<nbPoints; c++){
-        
-        if (sampleCluster_idx[c] == clusterIdx){
-            counter+=1;
-            for(d=0;d<nbCoordinates;d++)
+//Move centroids
+    int clusterIdx=0;
+    while( clusterIdx < nbCluster){
+        double acc[nbCoordinates];
+        int counter=0;
+        for (c=0; c < nbPoints; c++){
+            if (sampleCluster_idx[c] == clusterIdx){
+                counter+=1;
+                for(d=0;d < nbCoordinates;d++)
+                {
+                    acc[d]+=data_x[d+c*nbCoordinates];
+                }
+            }
+        } 
+        if (counter != 0){
+            for (d=0;d < nbCoordinates;d++)
             {
-              int pos_x;
-              pos_x=d+c*nbCoordinates;
-              acc[d]+=data_x[pos_x];
+                printf("\nacc[%d]=%2f ,with counter[%d]=%d ,\n",d,acc[d],clusterIdx,counter);
+                tempCentroids[d+clusterIdx*nbCoordinates]=acc[d]/(float)counter;
+                acc[d]=0;
             }
         }
-        }    
-    for (d=0;d<nbCoordinates;d++)
-    {
-     
-        tempCentroids[d+clusterIdx*nbCoordinates]=acc[d]/(float)counter;
-        
+        clusterIdx++;
     }
-        
-    }
-    
-
-    
 // restore centroids and testing if there is difference between vectors
-for(c=0;c<nbCluster;c++){
-    for(d==0;d<nbCoordinates;d++){
-        if (centroids[d+c*nbCoordinates]== tempCentroids[d+c*nbCoordinates]) ctrNoMove-=1;
-        centroids[d+c*nbCoordinates]= tempCentroids[d+c*nbCoordinates];
-    }
-} 
-printf("ctrNoMove= %d , \n", ctrNoMove);
-}while( ctrNoMove >0 && doKmeans < IterMAX+1);
+    for(c=0;c<nbCluster;c++){
+        for(d=0;d<nbCoordinates;d++){
+            if (centroids[d+c*nbCoordinates]== tempCentroids[d+c*nbCoordinates]) ctrNoMove+=1;
+            centroids[d+c*nbCoordinates]= tempCentroids[d+c*nbCoordinates];
+        }
+    } 
+}while( ctrNoMove < nbCluster*nbCoordinates);
 printf("\n========================the result of K-means Algorithm ==========================\n");
+printf("Nombre d iteration= %d , \n", ctrNoMove);
+//affichage des coordonnées des centroids
+int clusteIdx;
+for (clusteIdx=0;clusteIdx<nbCluster;clusteIdx++){
+    for(d=0;d<nbCoordinates;d++){
+        int posCt=d+clusteIdx*nbCoordinates;
+        printf("centroid i:%d,j:%d=  %d, ",clusteIdx,d,(int)centroids[posCt]); 
+    }
+    printf("\n");
+}
+//print results in a txt file to plot it in matlab 
+FILE* dataOut = NULL;
+dataOut = fopen("centroids.txt", "w");
+if (dataOut != NULL){
+    for (clusteIdx=0;clusteIdx<nbCluster;clusteIdx++){
+        for(d=0;d<nbCoordinates;d++){
+            int posCt=d+clusteIdx*nbCoordinates;
+            fprintf(dataOut,"%d ",(int)centroids[posCt]); 
+
+        }   
+        fputc('\n', dataOut);
+    }
+}
+else{
+    printf("Impossible d'ouvrir le fichier centroids.txt");
+}
+
 
  
-//affichage
-  int clusteIdx;
- for (clusteIdx=0;clusteIdx<nbCluster;clusteIdx++)
- {
-     for(d=0;d<nbCoordinates;d++)
-     {
-      int posCt=d+clusteIdx*nbCoordinates;
-      printf("centroid i:%d,j:%d=  %d, ",clusteIdx,d,(int)centroids[posCt]); 
-     }
-     printf("\n");
- }
-//print results in a txt file Print a text file to vizualize in matlab and a header
- FILE* dataOut = NULL;
-dataOut = fopen("centroids.txt", "w");
-    if (dataOut != NULL){
-        for (clusteIdx=0;clusteIdx<nbCluster;clusteIdx++){
-            for(d=0;d<nbCoordinates;d++){
-                int posCt=d+clusteIdx*nbCoordinates;
-                fprintf(dataOut,"%d ",(int)centroids[posCt]); 
-                
-            }
-        fputc('\n', dataOut);
-        }
-    }
-    else
-    {
-        printf("Impossible d'ouvrir le fichier centroids.txt");
-    }
-
-
-  fclose(dataOut); 
-//desallocate data_x
-
+//housekeeping
+ fclose(dataOut); 
 free(data_x);
 free(tempCentroids);
-
 free(centroids);
-
+// main results
 return 0;
 }

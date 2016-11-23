@@ -7,7 +7,7 @@ static const uint nbCluster=10;
 
 float distEuclid(float a,float b);
 
-int minItem(float dist_x[], int n);
+int minItem(double dist_x[], int n);
 
 
 

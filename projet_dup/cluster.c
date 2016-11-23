@@ -6,16 +6,16 @@
 
 float distEuclid(float a, float b)
 {
-    fflush(stdin);
-	//float test = (a-b)*(a-b);
+    
+	//printf("dist a,b= %2f",(a-b)*(a-b));
 	// printf("%f\n", test);
 	return (a-b) * (a-b);
 }
 
 
-int minItem(float dist_x[], int k){
-        fflush(stdin);
-	float minimum ;
+int minItem(double dist_x[], int k){
+       
+	double minimum ;
 	minimum= dist_x[0];
         //printf("minimum here= %f",minimum);
 
@@ -39,3 +39,4 @@ int minItem(float dist_x[], int k){
 	// }
 	return ci;
 }
+//void clusterAssign( int nbPoints, nbCoordinates

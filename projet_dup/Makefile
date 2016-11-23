@@ -1,6 +1,6 @@
 clustering:
 	
-	gcc cl_main.c -o3 -s -lm -o cl_main
+	gcc cl_main.c -O3 -s -lm -o cl_main
 
 generator:
 	gcc header_generator.c -O3 -s -lm -o header_generator
